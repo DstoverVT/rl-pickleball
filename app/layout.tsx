@@ -4,8 +4,8 @@ import "./globals.css";
 import Nav from "@/components/Nav";
 
 export const metadata: Metadata = {
-  title: "Rocket Lab Pickleball League",
-  description: "Internal league tracker",
+  title: "League Tracker",
+  description: "",
 };
 
 export default async function RootLayout({
