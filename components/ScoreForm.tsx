@@ -47,9 +47,9 @@ export default function ScoreForm({
   return (
     <form onSubmit={handleSubmit}>
       <input type="hidden" name="matchId" value={matchId} />
-      <div className="flex items-center gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
         {/* Home team */}
-        <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
+        <div className="w-full sm:flex-1 flex items-center justify-center sm:justify-end gap-2 min-w-0">
           <span className="font-medium truncate" style={{ color: isComplete && !homeWon ? "var(--accent)" : "var(--text)" }}>
             {homeTeamName}
           </span>
@@ -57,7 +57,7 @@ export default function ScoreForm({
         </div>
 
         {/* Score inputs */}
-        <div className="flex items-center gap-2 shrink-0 w-36">
+        <div className="flex items-center justify-center gap-2 shrink-0 sm:w-36">
           <input
             type="number"
             name="homeScore"
@@ -90,7 +90,7 @@ export default function ScoreForm({
         </div>
 
         {/* Away team */}
-        <div className="flex-1 flex items-center justify-start gap-2 min-w-0">
+        <div className="w-full sm:flex-1 flex items-center justify-center sm:justify-start gap-2 min-w-0">
           {awayWon && <span className="text-xs font-bold tracking-wider px-1 rounded shrink-0" style={{ background: "var(--win)", color: "var(--win-text)" }}>WIN</span>}
           <span className="font-medium truncate" style={{ color: isComplete && !awayWon ? "var(--accent)" : "var(--text)" }}>
             {awayTeamName}
@@ -98,7 +98,7 @@ export default function ScoreForm({
         </div>
 
         {/* Button + toast */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center justify-center gap-3 shrink-0">
           {!editable ? (
             <span className="text-xs" style={{ color: "var(--muted)" }}>Locked</span>
           ) : toast ? (

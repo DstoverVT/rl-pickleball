@@ -164,27 +164,27 @@ export default async function SchedulePage({
                   style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
                 >
                   {isBye ? (
-                    <div className="flex items-center gap-8">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
                       {/* BYE team name — same slot as home team in regular matches */}
-                      <div className="flex-1 flex items-center justify-end gap-2 min-w-0">
+                      <div className="w-full sm:flex-1 flex items-center justify-center sm:justify-end gap-2 min-w-0">
                         <span className="font-medium truncate">{match.homeTeam?.name}</span>
                         <span className="text-xs shrink-0" style={{ color: "var(--muted)" }}>BYE</span>
                       </div>
                       {/* Spacer matching score inputs width */}
-                      <div className="w-36 shrink-0" />
+                      <div className="hidden sm:block sm:w-36 sm:shrink-0" />
                       {/* Volunteer select — same flex-1 slot as away team name */}
                       {!editable ? (
-                        <div className="flex-1" />
+                        <div className="hidden sm:block sm:flex-1" />
                       ) : (
                         <form
                           id={`bye-form-${match.id}`}
                           action={assignByeOpponent}
-                          className="flex-1 flex items-center"
+                          className="w-full sm:flex-1 flex items-center"
                         >
                           <input type="hidden" name="matchId" value={match.id} />
                           <select
                             name="teamId"
-                            className="rounded px-2 py-1.5 text-sm"
+                            className="w-full sm:w-auto rounded px-2 py-1.5 text-sm"
                             style={{
                               background: "var(--bg)",
                               border: "1px solid var(--border)",
@@ -204,7 +204,7 @@ export default async function SchedulePage({
                         </form>
                       )}
                       {/* Assign button — same shrink-0 slot as Save/Update button */}
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center justify-center gap-3 shrink-0">
                         {!editable ? (
                           <span className="text-xs" style={{ color: "var(--muted)" }}>Locked</span>
                         ) : (

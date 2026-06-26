@@ -56,10 +56,10 @@ export default async function StandingsPage() {
         </p>
       ) : (
         <div
-          className="rounded overflow-hidden"
+          className="rounded overflow-x-auto"
           style={{ border: "1px solid var(--border)" }}
         >
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr style={{ background: "var(--surface2)" }}>
                 <th className="text-left px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium w-12" style={{ color: "var(--muted)" }}>

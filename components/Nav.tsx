@@ -12,7 +12,7 @@ export default async function Nav() {
         borderBottom: "1px solid var(--border)",
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 flex items-center gap-6 h-14">
+      <div className="max-w-7xl mx-auto px-4 flex flex-wrap items-center gap-x-4 gap-y-2 py-2 sm:py-0 sm:h-14 sm:flex-nowrap sm:gap-6">
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <Image src="/logo.svg" alt="Rocket Lab Pickleball" width={36} height={36} />
           <div>
@@ -31,7 +31,7 @@ export default async function Nav() {
           </div>
         </Link>
 
-        <nav className="flex items-center gap-1 ml-4">
+        <nav className="flex items-center gap-1 order-last w-full sm:order-none sm:w-auto sm:ml-4">
           <NavLink href="/">Standings</NavLink>
           <NavLink href="/schedule">Schedule</NavLink>
           <NavLink href="/playoffs">Playoffs</NavLink>
