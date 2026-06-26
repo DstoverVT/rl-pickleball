@@ -1,65 +1,156 @@
-import Image from "next/image";
+import { prisma } from "@/lib/db";
+import { computeStandings } from "@/lib/standings";
+import Link from "next/link";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function StandingsPage() {
+  const season = await prisma.season.findFirst({ where: { isActive: true } });
+
+  if (!season) {
+    return (
+      <div className="text-center py-24">
+        <div
+          className="text-xs tracking-[0.3em] uppercase mb-4"
+          style={{ color: "var(--accent)" }}
+        >
+          No Active Season
+        </div>
+        <p style={{ color: "var(--muted)" }} className="text-sm">
+          An admin needs to set up a season.{" "}
+          <Link href="/admin/login" style={{ color: "var(--text)" }} className="underline">
+            Admin login →
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
+  const [teams, matches] = await Promise.all([
+    prisma.team.findMany({ where: { seasonId: season.id }, orderBy: { name: "asc" } }),
+    prisma.match.findMany({ where: { seasonId: season.id } }),
+  ]);
+
+  const standings = computeStandings(teams, matches);
+
+  const playoffCutline = season.playoffTeamCount;
+  const showPlayoffMarkers = season.status === "REGULAR" || season.status === "PLAYOFFS";
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div>
+      <div className="flex items-baseline gap-4 mb-6">
+        <h1
+          className="text-xs tracking-[0.3em] uppercase font-bold"
+          style={{ color: "var(--accent)" }}
+        >
+          Standings
+        </h1>
+        <span className="text-xs" style={{ color: "var(--muted)" }}>
+          {season.name} · {season.status}
+        </span>
+      </div>
+
+      {standings.length === 0 ? (
+        <p className="text-sm" style={{ color: "var(--muted)" }}>
+          No teams yet. Check back after an admin sets up the season.
+        </p>
+      ) : (
+        <div
+          className="rounded overflow-hidden"
+          style={{ border: "1px solid var(--border)" }}
+        >
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: "var(--surface2)" }}>
+                <th className="text-left px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium w-12" style={{ color: "var(--muted)" }}>
+                  #
+                </th>
+                <th className="text-left px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  Team
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  W
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  L
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  Played
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  Pts For
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  Pts Against
+                </th>
+                <th className="text-right px-4 py-3 text-xs tracking-[0.15em] uppercase font-medium" style={{ color: "var(--muted)" }}>
+                  W/L Diff
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {standings.map((s, idx) => {
+                const isPlayoffLine = idx === playoffCutline - 1 && showPlayoffMarkers;
+                const isPlayoff = s.seed <= playoffCutline;
+                return (
+                  <tr
+                    key={s.team.id}
+                    style={{
+                      background: idx % 2 === 0 ? "var(--surface)" : "var(--bg)",
+                      borderBottom: isPlayoffLine
+                        ? "2px solid var(--accent)"
+                        : "1px solid var(--border)",
+                    }}
+                  >
+                    <td className="px-4 py-3 font-mono text-sm tabular-nums" style={{ color: "var(--muted)" }}>
+                      {s.seed}
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      {s.team.name}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono tabular-nums" style={{ color: s.wins > 0 ? "var(--text)" : "var(--muted)" }}>
+                      {s.wins}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono tabular-nums" style={{ color: "var(--muted)" }}>
+                      {s.losses}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono tabular-nums" style={{ color: "var(--muted)" }}>
+                      {s.matchesPlayed}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono tabular-nums" style={{ color: "var(--muted)" }}>
+                      {s.gamesFor}
+                    </td>
+                    <td className="px-4 py-3 text-right font-mono tabular-nums" style={{ color: "var(--muted)" }}>
+                      {s.gamesAgainst}
+                    </td>
+                    <td
+                      className="px-4 py-3 text-right font-mono tabular-nums"
+                      style={{ color: s.wins - s.losses > 0 ? "var(--win)" : s.wins - s.losses < 0 ? "var(--accent)" : "var(--text)" }}
+                    >
+                      {s.wins - s.losses > 0 ? `+${s.wins - s.losses}` : s.wins - s.losses}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      )}
+
+      {showPlayoffMarkers && (
+        <p className="mt-3 text-xs" style={{ color: "var(--muted)" }}>
+          Top {playoffCutline} teams advance to playoffs · Red line marks cutoff
+        </p>
+      )}
+      <div className="mt-3 text-xs" style={{ color: "var(--muted)" }}>
+        <div className="mb-1">Standings order calculation:</div>
+        <ol className="space-y-0.5 list-decimal list-inside">
+          <li>Win/Loss Diff</li>
+          <li>Head-to-head</li>
+          <li>Wins</li>
+          <li>Pts diff</li>
+        </ol>
+      </div>
     </div>
   );
 }

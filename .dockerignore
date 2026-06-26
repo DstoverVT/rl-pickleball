@@ -1,0 +1,14 @@
+.git
+.gitignore
+node_modules
+.next
+*.db
+*.db-journal
+.env
+.env.*
+__tests__
+*.test.ts
+README.md
+initial-plan.md
+docker-compose.yml
+.gitlab-ci.yml

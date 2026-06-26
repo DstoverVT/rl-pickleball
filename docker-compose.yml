@@ -1,0 +1,15 @@
+services:
+  app:
+    image: ${REGISTRY_IMAGE:-pickleball:latest}
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: file:/data/prod.db
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-rocketlab}
+      NODE_ENV: production
+    volumes:
+      - db_data:/data
+    restart: unless-stopped
+
+volumes:
+  db_data:

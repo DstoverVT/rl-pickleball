@@ -1,0 +1,70 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Season {
+  id               Int           @id @default(autoincrement())
+  name             String
+  numWeeks         Int
+  scheduleType     String        @default("ROUND_ROBIN")
+  playoffTeamCount Int           @default(8)
+  status           String        @default("SETUP")
+  isActive         Boolean       @default(false)
+  currentWeek      Int?
+  createdAt        DateTime      @default(now())
+  teams            Team[]
+  matches          Match[]
+  playoffMatches   PlayoffMatch[]
+}
+
+model Team {
+  id        Int      @id @default(autoincrement())
+  seasonId  Int
+  season    Season   @relation(fields: [seasonId], references: [id])
+  name      String
+  color     String?
+  createdAt DateTime @default(now())
+
+  homeMatches     Match[]        @relation("HomeTeam")
+  awayMatches     Match[]        @relation("AwayTeam")
+  playoffMatches1 PlayoffMatch[] @relation("Team1")
+  playoffMatches2 PlayoffMatch[] @relation("Team2")
+}
+
+model Match {
+  id         Int     @id @default(autoincrement())
+  seasonId   Int
+  season     Season  @relation(fields: [seasonId], references: [id])
+  week       Int
+  homeTeamId Int?
+  awayTeamId Int?
+  homeTeam   Team?   @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam   Team?   @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homeScore  Int?
+  awayScore  Int?
+  status     String  @default("SCHEDULED")
+  isByeSlot  Boolean @default(false)
+}
+
+model PlayoffMatch {
+  id          Int    @id @default(autoincrement())
+  seasonId    Int
+  season      Season @relation(fields: [seasonId], references: [id])
+  round       Int
+  slot        Int
+  team1Id     Int?
+  team2Id     Int?
+  team1       Team?  @relation("Team1", fields: [team1Id], references: [id])
+  team2       Team?  @relation("Team2", fields: [team2Id], references: [id])
+  score1      Int?
+  score2      Int?
+  nextMatchId Int?
+  nextSlot    Int?
+  status      String @default("SCHEDULED")
+}
