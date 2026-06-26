@@ -6,6 +6,7 @@ services:
     environment:
       DATABASE_URL: file:/data/prod.db
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-rocketlab}
+      SITE_PASSWORD: ${SITE_PASSWORD:-pickleball}
       NODE_ENV: production
     volumes:
       - db_data:/data

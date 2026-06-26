@@ -62,10 +62,27 @@ export default async function SchedulePage({
       {allTeams.length > 0 && (
         <details className="mb-6 group">
           <summary
-            className="text-xs tracking-wider uppercase cursor-pointer select-none mb-3 inline-flex items-center gap-2"
-            style={{ color: "var(--text)" }}
+            className="text-xs tracking-wider uppercase cursor-pointer select-none mb-3 inline-flex items-center gap-2 px-3 py-1.5 rounded font-bold"
+            style={{
+              color: "var(--text)",
+              background: "var(--surface2)",
+              border: "1px solid var(--border)",
+              listStyle: "none",
+            }}
           >
             Rename Your Team
+            <svg
+              className="w-3 h-3 transition-transform duration-150 group-open:rotate-180"
+              style={{ color: "var(--muted)" }}
+              viewBox="0 0 12 12"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="2,4 6,8 10,4" />
+            </svg>
           </summary>
           <div className="flex flex-wrap gap-2 mt-3">
             {allTeams.map((team) => (

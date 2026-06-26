@@ -30,6 +30,13 @@
   box-sizing: border-box;
 }
 
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
 button, [role="button"], a {
   cursor: pointer !important;
 }
