@@ -83,7 +83,7 @@ describe("computeStandings", () => {
     expect(standings.every((s) => s.wins === 0)).toBe(true);
   });
 
-  it("bye slot: only bye team (home) gets credit, volunteer (away) unaffected", () => {
+  it("bye slot: both bye team (home) and volunteer (away) get credit", () => {
     const teams = [team(1), team(2)];
     const byeMatch: Match = {
       id: 1,
@@ -100,13 +100,16 @@ describe("computeStandings", () => {
     const t1 = standings.find((s) => s.team.id === 1)!;
     const t2 = standings.find((s) => s.team.id === 2)!;
     expect(t1.wins).toBe(1);
+    expect(t1.losses).toBe(0);
     expect(t1.gamesFor).toBe(2);
+    expect(t1.gamesAgainst).toBe(1);
     expect(t2.wins).toBe(0);
-    expect(t2.losses).toBe(0);
-    expect(t2.gamesFor).toBe(0);
+    expect(t2.losses).toBe(1);
+    expect(t2.gamesFor).toBe(1);
+    expect(t2.gamesAgainst).toBe(2);
   });
 
-  it("bye slot: bye team gets a loss if volunteer wins", () => {
+  it("bye slot: bye team gets a loss and volunteer a win if volunteer wins", () => {
     const teams = [team(1), team(2)];
     const byeMatch: Match = {
       id: 1,
@@ -122,8 +125,9 @@ describe("computeStandings", () => {
     const standings = computeStandings(teams, [byeMatch]);
     const t1 = standings.find((s) => s.team.id === 1)!;
     const t2 = standings.find((s) => s.team.id === 2)!;
+    expect(t1.wins).toBe(0);
     expect(t1.losses).toBe(1);
-    expect(t2.wins).toBe(0);
+    expect(t2.wins).toBe(1);
     expect(t2.losses).toBe(0);
   });
 });

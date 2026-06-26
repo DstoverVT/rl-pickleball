@@ -44,12 +44,18 @@ export function computeStandings(
       const away = stats.get(m.awayTeamId);
 
       if (m.isByeSlot) {
-        // Only the bye team (home) gets their record updated; volunteer (away) is unaffected
+        // Both the bye team (home) and the volunteer (away) get their records updated
         if (home) {
           home.gamesFor += m.homeScore;
           home.gamesAgainst += m.awayScore;
           if (m.homeScore > m.awayScore) home.wins++;
           else home.losses++;
+        }
+        if (away) {
+          away.gamesFor += m.awayScore;
+          away.gamesAgainst += m.homeScore;
+          if (m.awayScore > m.homeScore) away.wins++;
+          else away.losses++;
         }
       } else {
         // Normal match — update both teams
